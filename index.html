@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>School Portal</title>
+<!-- SETUP: 1) create a Supabase project  2) run setup.sql in the SQL Editor  3) Authentication > Providers > Email: turn OFF "Confirm email"  4) paste Project URL and anon key into SB_URL and SB_KEY below. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--nav:#0e4d64;--pri:#0e4d64;--on:#fff;--acc:#ff7a59;--bg:#f3f6f8;--card:#fff;--ln:#e0e7ec;--txt:#14232c;--mut:#5d6d77;--bad:#c0392b;--ok:#1b8a5a;--sh:0 2px 10px #0e4d6414}
+:root[data-theme=dark]{--nav:#0a2f3d;--pri:#5cc0e0;--on:#06202b;--bg:#0c1519;--card:#142027;--ln:#25353d;--txt:#e6eef2;--mut:#93a5af;--bad:#ff8a80;--sh:0 2px 10px #0006}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.55 "Nunito Sans","Segoe UI",system-ui,sans-serif}
+h1,h2,h3,.tile b,.card b{font-family:"Bricolage Grotesque","Trebuchet MS",sans-serif}
+h1{font-size:1.7rem;margin:.2rem 0 .8rem}h2{font-size:1.15rem;margin:1.5rem 0 .5rem}h3{margin:0 0 .2rem}a{color:var(--pri)}
+.app{display:flex;min-height:100vh}
+aside{width:240px;flex-shrink:0;background:var(--nav);color:#fff;padding:1rem .8rem;display:flex;flex-direction:column;gap:1rem;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{display:flex;align-items:center;gap:.6rem}.brand b{font-family:"Bricolage Grotesque",sans-serif;line-height:1.2}
+aside nav,.sp{display:flex;flex-direction:column;gap:.2rem}.sp{margin-top:auto}
+aside button{text-align:left;color:#fff;border:0;border-radius:10px;padding:.6rem .8rem;background:transparent;box-shadow:none;transition:background .15s,transform .15s}
+aside button:hover{background:#ffffff24;transform:translateX(3px)}
+aside nav button.on{background:#fff;color:var(--nav);font-weight:700}
+main{flex:1;min-width:0;padding:1.5rem;max-width:1000px;animation:in .3s}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+button{font:inherit;padding:.55rem 1rem;border:1px solid var(--ln);background:var(--card);color:inherit;border-radius:10px;cursor:pointer;transition:transform .12s,box-shadow .15s}
+button:hover{box-shadow:var(--sh)}button:active{transform:scale(.97)}
+button.p{background:var(--pri);color:var(--on);border-color:var(--pri);font-weight:700}
+button.w{width:100%;padding:.75rem}button.lk{border:0;background:none;text-decoration:underline;color:inherit;box-shadow:none}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+label{display:block;margin:.6rem 0;font-weight:700;font-size:.92rem}
+input,textarea,select{font:inherit;width:100%;padding:.6rem .7rem;border:1.5px solid var(--ln);border-radius:10px;background:var(--card);color:inherit;margin-top:.25rem;transition:border-color .15s,box-shadow .15s}
+input:focus,textarea:focus,select:focus{outline:0;border-color:var(--pri);box-shadow:0 0 0 3px #1d7fa433}
+.row{display:flex;gap:.8rem;flex-wrap:wrap;align-items:end}.row>label{flex:1;min-width:140px}
+.wrap{overflow-x:auto;border-radius:12px}table{width:100%;border-collapse:collapse;background:var(--card)}
+th{background:var(--nav);color:#fff;text-align:left;padding:.6rem}td{padding:.6rem;border-bottom:1px solid var(--ln)}tr:hover td{background:#1d7fa414}td input{width:5.5em;margin:0}
+.tiles,.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.8rem}
+.tile,.panel,.card{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:1rem;box-shadow:var(--sh);transition:transform .15s;position:relative}
+.tile:hover,.card:hover{transform:translateY(-3px)}
+.tile small,.card small{display:block;color:var(--mut);font-size:.75rem;text-transform:uppercase;letter-spacing:.05em}
+.tile b,.card b{font-size:2rem;line-height:1.1}.panel{margin:1rem 0}.panel h2{margin-top:0}
+.card.lk2{text-align:left;display:flex;flex-direction:column;gap:.2rem;align-items:flex-start;font-weight:400}.card.lk2 b{font-size:1.05rem}
+.card .x{position:absolute;top:.4rem;right:.4rem;padding:.1rem .55rem}
+.av{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:50%;background:var(--acc);color:#fff;font-weight:800}.av.big{width:64px;height:64px;font-size:1.4rem}
+.hd{display:flex;gap:1rem;align-items:center}.hd p,.hl{margin:0;color:var(--mut)}
+.chip{display:inline-block;padding:.05rem .6rem;border-radius:99px;font-weight:800;font-size:.85rem}
+.g1{background:#d9f3e6;color:#126b44}.g2{background:#fdecc8;color:#855400}.g3{background:#fbdcd8;color:#a52c20}
+.bar{display:block;height:.55rem;background:var(--acc);border-radius:99px;margin-top:.5rem;animation:grow .7s ease-out}@keyframes grow{from{width:0}}
+.tr{display:grid;grid-template-columns:90px 1fr auto;gap:.6rem;align-items:center;margin:.3rem 0}.tr .bar{margin:0}
+.up{color:var(--ok)}.dn,.bad{color:var(--bad)}.edit{border-left:4px solid var(--acc);padding-left:1rem;margin:1rem 0}
+details{border-bottom:1px solid var(--ln);padding:.5rem 0}summary{cursor:pointer;font-weight:700}
+.logo{width:48px;height:48px;object-fit:contain;border-radius:10px;background:#fff}
+.ic{width:48px;height:48px;border-radius:12px;background:var(--acc);color:#fff;display:grid;place-items:center}
+.land{min-height:100vh;display:grid;place-items:center;padding:1rem;background:radial-gradient(circle at 20% 0,#1d7fa4,var(--nav) 55%)}
+.hero,.lbox{width:100%;max-width:420px}.hero{text-align:center;color:#fff}
+.lbox{background:var(--card);color:var(--txt);border-radius:18px;padding:1.5rem;box-shadow:0 20px 50px #0006}
+.hero .logo,.hero .ic,.lbox .logo,.lbox .ic{width:72px;height:72px;margin:0 auto;display:grid}.hero .ic svg{width:44px;height:44px}
+.hero h1{font-size:2.2rem}.lbox h1,.sub,.c{text-align:center}.who{display:grid;gap:.6rem;margin:1.2rem 0}
+.who button{padding:.85rem;font-size:1.05rem;background:#fff;color:#0e4d64;border-color:#fff;font-weight:700}.hero .lk{color:#fff}
+.toast{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--txt);color:var(--bg);padding:.7rem 1.1rem;border-radius:12px;box-shadow:var(--sh);animation:toast 4s forwards;z-index:9}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,10px)}8%,85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;visibility:hidden}}
+.site{min-height:100vh;background:var(--bg);padding-bottom:3rem}.site>*{max-width:960px;margin-left:auto;margin-right:auto}
+.nb{display:flex;align-items:center;gap:.7rem;padding:.8rem 1rem}.nb .gap{flex:1}.nb b{font-family:"Bricolage Grotesque",sans-serif;font-size:1.1rem}.nb .logo,.nb .ic{width:40px;height:40px}.nb .ic svg{width:24px;height:24px}
+.hero2{margin:1rem auto;padding:3rem 1.5rem;border-radius:22px;color:#fff;text-align:center;background:radial-gradient(circle at 15% 0,#1d7fa4,var(--nav) 60%)}
+.hero2 h1{font-size:clamp(1.8rem,5vw,2.8rem);line-height:1.15;margin:0 auto .6rem;max-width:20ch}.hero2 p{max-width:52ch;margin:0 auto 1.4rem;opacity:.9}
+.hero2 button.big{background:#fff;color:#0e4d64;border-color:#fff;padding:.8rem 1.8rem;font-size:1.05rem}
+.site .grid.f,.site .panel{margin:1rem}.site .grid.f{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+@media(max-width:760px){.app{flex-direction:column}aside{width:auto;height:auto;position:static;flex-direction:row;flex-wrap:wrap;align-items:center;gap:.4rem}aside nav{flex-direction:row;flex-wrap:wrap}.sp{margin:0 0 0 auto;flex-direction:row}.brand b{display:none}main{padding:1rem}}
+@media print{aside,button,select,.np,.toast{display:none!important}.app{display:block}main{max-width:none;padding:0;animation:none}body{background:#fff;color:#000}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const SB_URL="",SB_KEY="";   // Supabase > Project Settings > API: Project URL and anon (publishable) key
+const SCHOOL="School Name",START="07:30";
+const T={
+en:{idlab:"Email, phone number or special ID",fmt:"Excel columns: Adm, Name, then one column per subject (Total and Position are optional).",nf2:"That is not one of your classes.",attn:"Attendance",pres:"Present",abs:"Absent",latee:"Late",allp:"All present",alla:"All absent",date:"Date",classes:"Classes",ctch:"Class teacher",room:"Room",cap:"Capacity",gn:"Guardian",gp:"Guardian phone",search:"Search (press Enter)",sure:"Delete this record?",rep:"Report card",prt:"Print report card",att_t:"Present today",dash:"Dashboard",cnt_l:"Total learners",cnt_c:"Classes",cnt_t:"Teachers",late_t:"Late today",byc:"By class",view:"View",app:"School Portal",login:"Log in",register:"Create account",email:"Email",pw:"Password",out:"Log out",upload:"Upload marks",learners:"Learners",teachers:"Teachers",myc:"My classes",cls:"Class",term:"Term",file:"Excel file (.xlsx)",check:"Check file",confirm:"Save to school records",adm:"Admission no.",name:"Name",code:"Special ID",add:"Add learner",save:"Save",edit:"Edit",marks:"Marks",total:"Total",pos:"Position",of:"out of",acad:"Academic progress",phys:"Physical progress",mind:"Mental wellbeing",late:"Late arrivals",none:"Nothing recorded yet.",link:"Link your child",linkhelp:"Enter the special ID you got from the school (example GSA001).",subj:"Class and subject",assign:"Teaching (Class:Subject, Class:Subject)",clock:"Clock in",ok:"Saved.",bad:"Problems found (these rows are skipped)",trend:"Total by term",up:"Improving",down:"Dropped",same:"Steady",lang:"Kiswahili",min:"min late",addt:"Add teacher",rows:"learners ready",lateadd:"Log late arrival",mins:"Minutes late",need:"Class, term and file are required.",nf:"Not found. Check the number and code."},
+sw:{idlab:"Barua pepe, namba ya simu au kitambulisho maalum",fmt:"Safu za Excel: Adm, Name, kisha safu moja kwa kila somo (Total na Position si lazima).",nf2:"Hili si darasa lako.",attn:"Mahudhurio",pres:"Yupo",abs:"Hayupo",latee:"Amechelewa",allp:"Wote wapo",alla:"Wote hawapo",date:"Tarehe",classes:"Madarasa",ctch:"Mwalimu wa darasa",room:"Chumba",cap:"Uwezo",gn:"Mlezi",gp:"Simu ya mlezi",search:"Tafuta (bonyeza Enter)",sure:"Futa rekodi hii?",rep:"Kadi ya matokeo",prt:"Chapisha kadi ya matokeo",att_t:"Waliopo leo",dash:"Dashibodi",cnt_l:"Jumla ya wanafunzi",cnt_c:"Madarasa",cnt_t:"Walimu",late_t:"Waliochelewa leo",byc:"Kwa darasa",view:"Angalia",app:"Mfumo wa Shule",login:"Ingia",register:"Fungua akaunti",email:"Barua pepe",pw:"Nenosiri",out:"Toka",upload:"Pakia alama",learners:"Wanafunzi",teachers:"Walimu",myc:"Madarasa yangu",cls:"Darasa",term:"Muhula",file:"Faili ya Excel (.xlsx)",check:"Kagua faili",confirm:"Hifadhi kwenye rekodi za shule",adm:"Namba ya usajili",name:"Jina",code:"Kitambulisho maalum",add:"Ongeza mwanafunzi",save:"Hifadhi",edit:"Hariri",marks:"Alama",total:"Jumla",pos:"Nafasi",of:"kati ya",acad:"Maendeleo ya masomo",phys:"Maendeleo ya mwili",mind:"Ustawi wa akili",late:"Kuchelewa",none:"Hakuna rekodi bado.",link:"Unganisha mtoto wako",linkhelp:"Weka kitambulisho maalum ulichopewa na shule (mfano GSA001).",subj:"Darasa na somo",assign:"Anachofundisha (Darasa:Somo, Darasa:Somo)",clock:"Weka alama ya kufika",ok:"Imehifadhiwa.",bad:"Matatizo yamepatikana (safu hizi zimeachwa)",trend:"Jumla kwa muhula",up:"Anaboresha",down:"Ameshuka",same:"Thabiti",lang:"English",min:"dak. kuchelewa",addt:"Ongeza mwalimu",rows:"wanafunzi tayari",lateadd:"Rekodi kuchelewa",mins:"Dakika za kuchelewa",need:"Darasa, muhula na faili vinahitajika.",nf:"Haijapatikana. Angalia namba na msimbo."}};
+let L=localStorage.lang||"en";const t=k=>T[L][k]||T.en[k]||k;
+const $=s=>document.querySelector(s),app=$("#app");
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const key=s=>String(s).trim().replace(/\W+/g,"_"),dsp=s=>String(s).replace(/_/g," ");
+let GC="";
+const lvl=c=>{c=String(c||"").toLowerCase();const m=c.match(/(?:grade|gr|std|class)\s*(\d)/);if(m)return +m[1]>=7?"jun":"pri";return /pp|play|nursery|baby|pre/.test(c)?"pp":"pri"};
+const KJ=[[90,"EE1"],[75,"EE2"],[58,"ME1"],[41,"ME2"],[31,"AE1"],[21,"AE2"],[11,"BE1"],[1,"BE2"]],KP=[[75,"EE"],[41,"ME"],[21,"AE"],[1,"BE"]];
+const gr=p=>{if(S.cfg.grading=="abc")return p>=90?"A+":p>=80?"A":p>=70?"B":p>=60?"C":p>=50?"D":"F";const j=lvl(GC)=="jun",x=(j?KJ:KP).find(a=>p>=a[0]);return x?x[1]:(j?"BE2":"BE")};
+const rc=()=>{let c;do{c=[...crypto.getRandomValues(new Uint8Array(5))].map(x=>"ABCDEFGHJKMNPQRSTUVWXYZ23456789"[x%31]).join("")}while(!/[A-Z]/.test(c));return c};
+document.documentElement.dataset.theme=localStorage.theme||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");
+const thI=()=>document.documentElement.dataset.theme=="dark"?"☀":"☾",setTh=()=>{const n=document.documentElement.dataset.theme=="dark"?"light":"dark";document.documentElement.dataset.theme=n;localStorage.theme=n;render()};
+const pfx=()=>(S.cfg.prefix||String(sn()).split(/\s+/).filter(Boolean).map(w=>w[0]).join("").slice(0,3)||"SCH").toUpperCase().replace(/[^A-Z0-9]/g,"");
+function nextCodes(n){const p=pfx(),re=new RegExp("^"+p+"(\\d+)$");let m=0;S.learners.forEach(l=>{const x=re.exec(l.id);if(x)m=Math.max(m,+x[1])});return Array.from({length:n},(_,i)=>p+String(m+i+1).padStart(3,"0"))}
+const today=()=>new Date().toISOString().slice(0,10);
+const DOM="@parent.school.app",kind=v=>v.includes("@")?"email":/^[\d\s+()-]{7,}$/.test(v)?"phone":"id";
+const mail=v=>{v=v.trim();const k=kind(v);return k=="email"?v.toLowerCase():(k=="phone"?"p"+v.replace(/\D/g,""):"id"+v.toLowerCase().replace(/[^\w-]/g,""))+DOM};
+const S={home:1,land:1,cfg:{},cfgRow:false,classes:[],ac:"",ad:"",q:"",u:null,role:null,tab:null,learners:[],teachers:[],sheet:null,msg:"",edit:null,term:"",ai:0,me:null};
+let auth,db,sb;
+function ranks(a){const s=[...a].sort((x,y)=>y.total-x.total);let p=0,last=null;s.forEach((o,i)=>{if(o.total!==last){p=i+1;last=o.total}o.pos=p})}
+function note(m){S.msg=esc(m);render()}
+function setLang(){L=L=="en"?"sw":"en";localStorage.lang=L;document.documentElement.lang=L;render()}
+
+const ICON='<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><circle cx="12" cy="11" r="1.6"/><path d="M12 12.6V15"/></svg>';
+function loginV(){if(S.who=="parent"&&S.reg)return regV();return `<label>${t("idlab")}<input id="em" autocomplete="username" placeholder="name@mail.com / 0712345678 / ${esc(pfx())}001"></label><label>${t("pw")}<input id="pw" type="password" autocomplete="current-password"></label><button class="p w" onclick="go(0)">${t("login")}</button><p class="c"><button class="lk" onclick="${S.who=="parent"?"S.reg=1;render()":"go(1)"}">${t("register")}</button></p>`}
+function regV(){return `<h2>${t("regp")}</h2><label>${t("code")}<input id="rc" placeholder="${esc(pfx())}001" autocapitalize="characters"></label><label>${t("myph")}<input id="rp" type="tel" placeholder="0712345678"></label><p class="sub">${t("rhelp")}</p><label>${t("idlab")}<input id="rl" autocomplete="username" placeholder="name@mail.com / 0712345678"></label><label>${t("pw")}<input id="rw" type="password" autocomplete="new-password"></label><button class="p w" onclick="goReg()">${t("register")}</button><p class="c"><button class="lk" onclick="S.reg=0;render()">${t("login")}</button></p>`}
+async function goReg(){const g=i=>$(i).value.trim(),code=g("#rc").toUpperCase(),ph=g("#rp"),id=g("#rl")||ph,pw=$("#rw").value;if(!code||!ph||!id||pw.length<6)return note(t("need"));S.pend={code,ph};S.reg=0;try{await auth.createUserWithEmailAndPassword(mail(id),pw)}catch(x){S.pend=null;S.reg=1;note(x.message)}}
+async function go(reg){const v=$("#em").value.trim(),p=$("#pw").value;S.pend=null;
+ try{reg?await auth.createUserWithEmailAndPassword(mail(v),p):await auth.signInWithEmailAndPassword(mail(v),p)}catch(x){S.pend=null;note(x.message)}}
+
+async function load(){const c=db.collection("learners"),q=S.role==="parent"?c.where("parents","array-contains",S.u.uid):c;
+ S.learners=(await q.get()).docs.map(d=>({id:d.id,...d.data()}));
+ S.learners.sort((a,b)=>(a.cls+a.name).localeCompare(b.cls+b.name));
+ if(S.role==="admin"){S.teachers=(await db.collection("teachers").get()).docs.map(d=>({id:d.id,...d.data()}))}if(S.role!=="parent")S.classes=(await db.collection("classes").get()).docs.map(d=>({id:d.id,...d.data()}))}
+
+/* ---------- admin: upload ---------- */
+function upV(){const cl=[...new Set(S.learners.map(l=>l.cls))];
+ return `<h1>${t("upload")}</h1><div class="row"><label>${t("cls")}<input id="uc" list="cl" placeholder="Grade 5"></label><datalist id="cl">${cl.map(c=>`<option value="${esc(c)}">`).join("")}</datalist><label>${t("term")}<input id="ut" placeholder="Term 1 2026"></label></div><label>${t("file")}<input id="uf" type="file" accept=".xlsx,.xls,.csv"></label><p><button class="p" onclick="check()">${t("check")}</button> <button onclick="tpl()">${t("tpl")}</button></p>`+(S.sheet?sheetV():"")}
+async function check(){const f=$("#uf").files[0],cls=$("#uc").value.trim(),term=key($("#ut").value);
+ if(!f||!cls||!term)return note(t("need"));
+ if(S.role==="teacher"&&!(S.me.assign||[]).some(a=>a.cls===cls))return note(t("nf2"));
+ const wb=XLSX.read(await f.arrayBuffer()),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});
+ const ks=Object.keys(rows[0]||{}),K=re=>ks.find(k=>re.test(k)),ka=K(/adm|usajili/i),kn=K(/name|jina/i),kt=K(/total|jumla/i),kp=K(/pos|nafasi/i),subs=ks.filter(k=>![ka,kn,kt,kp].includes(k));
+ const bad=[],seen=new Set(),ok=[],cr=S.classes.find(c=>c.name===cls),req=(cr?.subj||"").split(",").map(x=>x.trim()).filter(Boolean),miss=req.filter(x=>!subs.some(k=>key(k)===key(x)));
+ if(!ka||!kn||!subs.length)bad.push("Columns needed: Adm, Name, and one column per subject.");
+ else if(miss.length)bad.push("Missing subject columns for "+cls+": "+miss.join(", "));
+ else rows.forEach((r,i)=>{const n=i+2,adm=String(r[ka]).trim().replace(/\W/g,""),nm=String(r[kn]).trim();
+  if(!adm||!nm)return bad.push(`Row ${n}: missing admission number or name`);
+  if(seen.has(adm))return bad.push(`Row ${n}: duplicate ${adm}`);seen.add(adm);
+  const ex=S.learners.find(l=>l.cls===cls&&(l.id.toUpperCase()===adm.toUpperCase()||l.adm===adm||l.name.toLowerCase()===nm.toLowerCase()));
+  if(S.role==="teacher"&&!ex)return bad.push(`Row ${n}: ${nm} not found in ${cls}`);
+  const m={};let sum=0,fine=true;
+  subs.forEach(s=>{const v=r[s];if(v==="")return;const x=Number(v);if(isNaN(x)||x<0||x>100){bad.push(`Row ${n}: ${s} must be 0–100`);fine=false}else{m[key(s)]=x;sum+=x}});
+  req.forEach(x=>{const k=subs.find(z=>key(z)===key(x));if(k&&r[k]===""){bad.push(`Row ${n}: ${x} is empty`);fine=false}});if(kt&&r[kt]!==""&&Number(r[kt])!==sum){bad.push(`Row ${n}: total ${r[kt]} does not match marks (${sum})`);fine=false}
+  if(fine)ok.push({id:ex?.id,adm:ex?.adm||adm,name:nm,subjects:m,total:sum,pos:kp&&r[kp]!==""?Number(r[kp]):0})});
+ if(ok.length&&!kp)ranks(ok);
+ S.sheet={cls,term,ok,bad};render()}
+function sheetV(){const s=S.sheet;
+ return `<h2>${s.ok.length} ${t("rows")}</h2>`+(s.bad.length?`<p class="bad"><b>${t("bad")}</b></p>`+s.bad.slice(0,15).map(x=>`<p class="bad">${esc(x)}</p>`).join(""):"")+(s.ok.length?`<div class="wrap"><table><tr><th>${t("adm")}<th>${t("name")}<th>${t("total")}<th>${t("pos")}</tr>${s.ok.slice(0,8).map(o=>`<tr><td>${esc(o.adm)}<td>${esc(o.name)}<td>${o.total}<td>${o.pos}</tr>`).join("")}</table></div><p><button class="p" onclick="saveSheet()">${t("confirm")}</button></p>`:"")}
+async function saveSheet(){const{cls,term,ok}=S.sheet;
+ if(S.role==="teacher"){const{error}=await sb.from("submissions").insert({id:Date.now()+rc(),cls,term,sender:S.u.email,rows:ok});S.sheet=null;return error?note(error.message):note(t("sent"))}
+ await publish(cls,term,ok);S.sheet=null;await load();S.tab="lr";note(t("ok"))}
+async function publish(cls,term,ok){const b=db.batch(),col=db.collection("learners"),cs=nextCodes(ok.filter(o=>!o.id).length);let i=0;
+ ok.forEach(o=>{const R={subjects:o.subjects,total:o.total,pos:o.pos,n:ok.length};
+  if(o.id)return b.set(col.doc(o.id),{results:{[term]:R}},{merge:true});
+  const id=cs[i++];b.set(col.doc(id),{adm:id,code:id,name:o.name,cls,mn:"",mp:"",me:"",fn:"",fp:"",fe:"",parents:[],notes:{},late:[],results:{[term]:R}},{merge:true})});
+ await b.commit()}
+function tpl(){const cls=$("#uc").value.trim();if(!cls)return note(t("need"));const cr=S.classes.find(c=>c.name===cls),req=(cr?.subj||defSub(cls)).split(",").map(x=>x.trim()).filter(Boolean),ks=S.learners.filter(l=>l.cls===cls),ws=XLSX.utils.aoa_to_sheet([["Adm","Name",...req],...ks.map(l=>[l.id,l.name])]),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Marks");XLSX.writeFile(wb,cls.replace(/\W+/g,"_")+"_template.xlsx")}
+async function loadSub(){const{data}=await sb.from("submissions").select("*").order("created",{ascending:false});S.subs=data||[];render()}
+function subT(x){const ks=[...new Set(x.rows.flatMap(o=>Object.keys(o.subjects)))];return `<div class="wrap"><table><tr><th>${t("adm")}<th>${t("name")}${ks.map(k=>`<th>${esc(dsp(k))}`).join("")}<th>${t("total")}<th>${t("pos")}</tr>${x.rows.map(o=>`<tr><td>${esc(o.adm)}<td>${esc(o.name)}${ks.map(k=>`<td>${o.subjects[k]??""}`).join("")}<td>${o.total}<td>${o.pos}</tr>`).join("")}</table></div>`}
+function rvV(){const q=S.subs||[];return `<h1>${t("review")}</h1><p>${t("rvh")}</p>`+(q.length?q.map(x=>`<div class="panel"><b>${esc(x.cls)}</b> · ${esc(dsp(x.term))} · ${esc(x.sender)} · ${x.rows.length} ${t("rows")} · <span class="chip ${x.status=="published"?"g1":"g2"}">${t(x.status||"pending")}</span><p><button onclick="S.sv=S.sv=='${x.id}'?null:'${x.id}';render()">${t("view")}</button> ${x.status!="published"?`<button class="p" onclick="pubSub('${x.id}')">${t("publish")}</button> `:""}<button onclick="delSub('${x.id}')">${t("rdel")}</button></p>${S.sv==x.id?subT(x):""}</div>`).join(""):`<p>${t("none")}</p>`)}
+async function pubSub(id){const x=S.subs.find(y=>y.id==id);try{await publish(x.cls,x.term,x.rows);await sb.from("submissions").update({status:"published"}).eq("id",id);await load();await loadSub();note(t("ok"))}catch(e){note(e.message)}}
+async function delSub(id){if(confirm(t("sure"))){await sb.from("submissions").delete().eq("id",id);loadSub()}}
+
+/* ---------- admin: learners and teachers ---------- */
+function lrV(){const q=S.q.toLowerCase(),L=S.learners.filter(l=>(l.name+l.adm+l.cls).toLowerCase().includes(q));
+ return `<h1>${t("learners")}</h1>`+(S.edit?editV(S.learners.find(l=>l.id==S.edit)):"")+`<div class="panel"><div class="row"><label>${t("name")}<input id="an"></label><label>${t("cls")}<input id="ac" list="cl2"></label><datalist id="cl2">${S.classes.map(c=>`<option value="${esc(c.name)}">`).join("")}</datalist></div><p class="hl">${t("code")}: <b>${nextCodes(1)[0]}</b></p><div class="row"><label>${t("mn")}<input id="mn"></label><label>${t("mp")}<input id="mp" type="tel"></label><label>${t("me")}<input id="me" type="email"></label></div><div class="row"><label>${t("fn")}<input id="fn"></label><label>${t("fp")}<input id="fp" type="tel"></label><label>${t("fe")}<input id="fe" type="email"></label></div><button class="p" onclick="addL()">${t("add")}</button></div><label>${t("search")}<input value="${esc(S.q)}" onchange="S.q=this.value;render()"></label><div class="wrap"><table><tr><th>${t("adm")}<th>${t("name")}<th>${t("cls")}<th>${t("code")}<th></tr>${L.map(l=>`<tr><td>${esc(l.adm)}<td>${esc(l.name)}<td>${esc(l.cls)}<td>${esc(l.id)}<td><button onclick="S.edit='${l.id}';render()">${t("edit")}</button> <button onclick="S.tab='rp';S.edit='${l.id}';render()">${t("rep")}</button> <button onclick="delL('${l.id}')">×</button></tr>`).join("")}</table></div>`}
+async function delL(id){if(confirm(t("sure"))){await db.collection("learners").doc(id).delete();S.edit=null;await load();render()}}
+async function addL(){const g=i=>$(i).value.trim(),name=g("#an"),cls=g("#ac");if(!name||!cls)return;const id=nextCodes(1)[0];
+ await db.collection("learners").doc(id).set({adm:id,name,cls,code:id,mn:g("#mn"),mp:g("#mp"),me:g("#me"),fn:g("#fn"),fp:g("#fp"),fe:g("#fe"),parents:[],results:{},notes:{},late:[],att:{}});await load();note(t("ok")+" "+id)}
+function tcV(){return `<h1>${t("teachers")}</h1><div class="row"><label>${t("name")}<input id="tn"></label><label>${t("email")}<input id="te" type="email"></label><label>${t("phone")}<input id="tp" type="tel"></label></div><label>${t("assign")}<input id="ta" placeholder="Grade 5:Math, Grade 6:English"></label><p><button class="p" onclick="addT()">${t("addt")}</button></p><div class="wrap"><table>${S.teachers.map(x=>`<tr><td>${esc(x.name)}<br>${esc(x.email)}<br>${esc(x.phone||"")}<td>${(x.assign||[]).map(a=>esc(a.cls+" "+dsp(a.subject))).join("<br>")}<td>${x.clock?esc(x.clock.d+" "+x.clock.time)+(x.clock.late?` (${x.clock.late} ${t("min")})`:""):""}</tr>`).join("")}</table></div>`}
+async function addT(){const em=$("#te").value.trim().toLowerCase();if(!em)return;
+ const assign=$("#ta").value.split(",").map(s=>s.split(":")).filter(p=>p.length==2&&p[0].trim()&&p[1].trim()).map(([c,s])=>({cls:c.trim(),subject:key(s)}));
+ await db.collection("teachers").doc(em).set({name:$("#tn").value.trim(),email:em,phone:$("#tp").value.trim(),assign},{merge:true});await load();note(t("ok"))}
+
+/* ---------- staff: notes, lateness ---------- */
+function editV(l){if(!l)return "";const n=l.notes||{},ad=S.role==="admin";
+ return `<div class="edit"><h2>${esc(l.name)} (${esc(l.cls)})</h2>`+(ad?`<div class="row"><label>${t("name")}<input id="e_n" value="${esc(l.name)}"></label><label>${t("cls")}<input id="e_c" value="${esc(l.cls)}"></label></div><div class="row"><label>${t("gn")}<input id="e_g" value="${esc(l.gn)}"></label><label>${t("gp")}<input id="e_p" value="${esc(l.gp)}"></label></div><div class="row"><label>${t("mn")}<input id="e_mn" value="${esc(l.mn)}"></label><label>${t("mp")}<input id="e_mp" value="${esc(l.mp)}"></label><label>${t("me")}<input id="e_me" value="${esc(l.me)}"></label></div><div class="row"><label>${t("fn")}<input id="e_fn" value="${esc(l.fn)}"></label><label>${t("fp")}<input id="e_fp" value="${esc(l.fp)}"></label><label>${t("fe")}<input id="e_fe" value="${esc(l.fe)}"></label></div>`:"")+["acad","phys","mind"].map(k=>`<label>${t(k)}<textarea id="n_${k}" rows="2">${esc(n[k])}</textarea></label>`).join("")+`<div class="row"><button class="p" onclick="saveN('${l.id}')">${t("save")}</button><label>${t("mins")}<input id="lm" type="number" min="1"></label><button onclick="addLate('${l.id}')">${t("lateadd")}</button></div></div>`}
+async function saveN(id){const d={notes:{acad:$("#n_acad").value,phys:$("#n_phys").value,mind:$("#n_mind").value}};
+ if(S.role==="admin")Object.assign(d,{name:$("#e_n").value.trim(),cls:$("#e_c").value.trim(),gn:$("#e_g").value.trim(),gp:$("#e_p").value.trim(),...Object.fromEntries(["mn","mp","me","fn","fp","fe"].map(k=>[k,$("#e_"+k).value.trim()]))});
+ await db.collection("learners").doc(id).update(d);S.edit=null;await load();note(t("ok"))}
+async function addLate(id){const m=Number($("#lm").value);if(!m)return;await db.collection("learners").doc(id).update({late:AU({d:today(),m})});await load();note(t("ok"))}
+
+/* ---------- teacher ---------- */
+function myV(){return `<h1>${esc(S.me.name)}</h1><p><button onclick="clk()">${t("clock")}</button> ${S.me.clock?esc(S.me.clock.d+" "+S.me.clock.time)+(S.me.clock.late?` (${S.me.clock.late} ${t("min")})`:""):""}</p>`+upPanel()}
+function upPanel(){const cl=[...new Set((S.me.assign||[]).map(a=>a.cls))];
+ return `<div class="panel"><h2>${t("upload")}</h2><p>${t("fmt")}</p><div class="row"><label>${t("cls")}<select id="uc">${cl.map(c=>`<option>${esc(c)}</option>`).join("")}</select></label><label>${t("term")}<input id="ut" placeholder="Term 1 2026"></label></div><label>${t("file")}<input id="uf" type="file" accept=".xlsx,.xls,.csv"></label><p><button class="p" onclick="check()">${t("check")}</button> <button onclick="tpl()">${t("tpl")}</button></p>${S.sheet?sheetV():""}</div>`}
+async function clk(){const n=new Date(),[h,m]=(S.cfg.start||START).split(":"),late=Math.max(0,n.getHours()*60+n.getMinutes()-(+h*60+ +m)),c={d:today(),time:n.toTimeString().slice(0,5),late};
+ await db.collection("teachers").doc(S.u.email.toLowerCase()).update({clock:c});S.me.clock=c;note(t("ok"))}
+
+/* ---------- parent ---------- */
+function linkV(){return `<h1>${t("link")}</h1><p>${t("linkhelp")}</p><div class="row"><label>${t("code")}<input id="la" placeholder="${esc(pfx())}001"></label><label>${t("myph")}<input id="lph" type="tel"></label><button class="p" onclick="link()">${t("link")}</button></div>`}
+async function linkId(code,ph,q){const id=String(code||"").trim().toUpperCase().replace(/\s/g,""),{data,error}=await sb.rpc("link_learner",{lid:id,ph:String(ph||"")});if(error||!data){if(!q)note(t("nf"));return false}await load();if(!q)render();return true}
+function link(){return linkId($("#la").value,$("#lph").value)}
+
+function attR(l){const v=Object.values(l.att||{}),n=v.length,c=k=>v.filter(x=>x===k).length;return `<h2>${t("attn")}: ${n?Math.round((c("P")+c("L"))/n*100)+"%":"-"}</h2><p>${t("pres")} ${c("P")}, ${t("abs")} ${c("A")}, ${t("latee")} ${c("L")}</p>`}
+function attV(){const cs=S.role==="admin"?[...new Set(S.learners.map(l=>l.cls))].sort():[...new Set((S.me.assign||[]).map(a=>a.cls))];
+ const c=cs.includes(S.ac)?S.ac:cs[0];S.ac=c;const d=S.ad||today(),k="d"+d.replace(/-/g,""),ks=S.learners.filter(l=>l.cls===c),v=ks.map(l=>l.att?.[k]),n=x=>v.filter(y=>y===x).length;
+ return `<h1>${t("attn")}</h1><div class="panel"><div class="row"><label>${t("cls")}<select onchange="S.ac=this.value;render()">${cs.map(x=>`<option ${x==c?"selected":""}>${esc(x)}</option>`).join("")}</select></label><label>${t("date")}<input type="date" value="${d}" onchange="S.ad=this.value;render()"></label></div>
+<p>${t("pres")} ${n("P")}, ${t("abs")} ${n("A")}, ${t("latee")} ${n("L")}</p><p><button onclick="allA('P')">${t("allp")}</button> <button onclick="allA('A')">${t("alla")}</button></p>
+<div class="wrap"><table>${ks.map((l,j)=>`<tr><td>${esc(l.name)}<td>${[["P","pres"],["A","abs"],["L","latee"]].map(([x,w])=>`<label style="display:inline;font-weight:normal;margin-right:.7rem"><input type="radio" style="width:auto" name="a${j}" value="${x}" ${(l.att?.[k]||"P")==x?"checked":""}> ${t(w)}</label>`).join("")}</tr>`).join("")}</table></div><p><button class="p" onclick="saveA()">${t("save")}</button></p></div>`}
+function allA(x){document.querySelectorAll(`input[type=radio][value=${x}]`).forEach(r=>r.checked=true)}
+async function saveA(){const k="d"+(S.ad||today()).replace(/-/g,""),b=db.batch();
+ S.learners.filter(l=>l.cls===S.ac).forEach((l,j)=>{const r=document.querySelector(`input[name=a${j}]:checked`);if(r)b.update(db.collection("learners").doc(l.id),{["att."+k]:r.value})});
+ await b.commit();await load();note(t("ok"))}
+const LV=["Play Group","PP1","PP2",...Array.from({length:9},(_,i)=>"Grade "+(i+1))],lvList=()=>String(S.cfg.levels||LV.join(", ")).split(",").map(x=>x.trim()).filter(Boolean);
+const SUBJ={pp:["Language Activities","Mathematical Activities","Environmental Activities","Psychomotor and Creative Activities","Religious Education Activities"],lo:["English","Kiswahili","Mathematics","Environmental Activities","Religious Education","Creative Activities"],up:["English","Kiswahili","Mathematics","Science and Technology","Social Studies","Agriculture and Nutrition","Creative Arts","Religious Education"],jun:["English","Kiswahili","Mathematics","Integrated Science","Social Studies","Pre-Technical Studies","Agriculture","Creative Arts and Sports","Religious Education"]};
+const defSub=n=>{const m=String(n).match(/(\d)/),v=lvl(n);return(v=="pp"?SUBJ.pp:v=="jun"?SUBJ.jun:m&&+m[1]<=3?SUBJ.lo:SUBJ.up).join(", ")};
+function autoS(){const e=$("#ks");if(!e.dataset.m)e.value=defSub($("#kc").value)}
+function clV(){return `<h1>${t("classes")}</h1><div class="panel"><div class="row"><label>${t("cls")}<input id="kc" list="lv" placeholder="Grade 5" oninput="autoS()"></label><datalist id="lv">${lvList().map(x=>`<option value="${esc(x)}">`).join("")}</datalist><label>${t("ctch")}<input id="kt"></label></div><label>${t("subjl")}<input id="ks" oninput="this.dataset.m=1"></label><div class="row"><label>${t("room")}<input id="kr"></label><label>${t("cap")}<input id="kp" type="number" min="1"></label><button class="p" onclick="addC()">${t("addcl")}</button> <button onclick="addAll()">${t("addall")}</button></div></div><div class="grid">${S.classes.map(c=>{const n=S.learners.filter(l=>l.cls===c.name).length,p=c.cap?Math.min(100,n/c.cap*100):0;return `<div class="card"><button class="x" onclick="delC('${c.id}')" aria-label="delete">×</button><h3>${esc(c.name)}</h3><p class="hl">${esc(c.teacher)}${c.room?` · ${esc(c.room)}`:""}</p><b>${n}${c.cap?` / ${esc(c.cap)}`:""}</b> <small>${t("learners")}</small><span class="bar" style="width:${p}%"></span><p><small>${esc(c.subj||"—")}</small></p><button onclick="editS('${c.id}')">${t("editsub")}</button></div>`}).join("")}</div>`}
+async function addC(){const name=$("#kc").value.trim();if(!name)return;await db.collection("classes").doc(key(name)).set({name,teacher:$("#kt").value.trim(),room:$("#kr").value.trim(),cap:$("#kp").value,subj:$("#ks").value.trim()||defSub(name)});await load();note(t("ok"))}
+async function addAll(){const b=db.batch(),have=S.classes.map(c=>c.name);lvList().filter(x=>!have.includes(x)).forEach(x=>b.set(db.collection("classes").doc(key(x)),{name:x,teacher:"",room:"",cap:"",subj:defSub(x)}));await b.commit();await load();note(t("ok"))}
+async function editS(id){const c=S.classes.find(x=>x.id==id),v=prompt(t("subjp"),c.subj||defSub(c.name));if(v==null)return;await db.collection("classes").doc(id).update({subj:v.split(",").map(x=>x.trim()).filter(Boolean).join(", ")});await load();render()}
+async function delC(id){if(confirm(t("sure"))){await db.collection("classes").doc(id).delete();await load();render()}}
+
+/* ---------- school settings, landing, support, progress ---------- */
+const sn=()=>S.cfg.name||SCHOOL,lg=()=>S.cfg.logo?`<img class="logo" src="${S.cfg.logo}" alt="">`:`<span class="ic">${ICON}</span>`;
+const avgR=r=>{const n=Object.keys(r.subjects||{}).length;return n?Math.round(r.total/n):0},gc=p=>S.cfg.grading=="abc"?(p>=70?"g1":p>=50?"g2":"g3"):(p>=75?"g1":p>=41?"g2":"g3"),ini=n=>String(n).split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase();
+Object.assign(T.en,{tag:"Track your child’s progress, marks and attendance in one place.",as_parent:"Parent login",as_teacher:"Teacher login",as_admin:"Admin login",back:"Back",lprog:"Learner progress",myprog:"My learner",support:"Support",settings:"Settings",logo:"School logo",opt:"optional",sname:"School name",schp:"School phone",sche:"School email",start:"Lesson start time",welcome:"Welcome! Set up your school",wmsg:"Add your school name and logo. You can skip this and change everything later in Settings.",skip:"Skip for now",cont:"Save and continue",remove:"Remove logo",chpw:"Change my password",newpw:"New password",contact:"Contact the school",phone:"Phone",avg:"Average",attp:"Attendance",best:"Strongest",weak:"Needs work",comm:"Teacher comments",pwok:"Password changed."});
+Object.assign(T.sw,{tag:"Fuatilia maendeleo, alama na mahudhurio ya mtoto wako mahali pamoja.",as_parent:"Mzazi ingia",as_teacher:"Mwalimu ingia",as_admin:"Msimamizi ingia",back:"Rudi",lprog:"Maendeleo ya wanafunzi",myprog:"Mwanafunzi wangu",support:"Msaada",settings:"Mipangilio",logo:"Nembo ya shule",opt:"si lazima",sname:"Jina la shule",schp:"Simu ya shule",sche:"Barua pepe ya shule",start:"Muda wa kuanza masomo",welcome:"Karibu! Weka taarifa za shule",wmsg:"Weka jina na nembo ya shule. Unaweza kuruka na kubadilisha kila kitu baadaye kwenye Mipangilio.",skip:"Ruka kwa sasa",cont:"Hifadhi na endelea",remove:"Ondoa nembo",chpw:"Badilisha nenosiri langu",newpw:"Nenosiri jipya",contact:"Wasiliana na shule",phone:"Simu",avg:"Wastani",attp:"Mahudhurio",best:"Hodari zaidi",weak:"Inahitaji juhudi",comm:"Maoni ya walimu",pwok:"Nenosiri limebadilishwa."});
+Object.assign(T.en,{addcl:"Add class",promo:"Track and manage your whole school in one place",promod:"One portal for parents, teachers and administrators. Set up your school in minutes with a one-time admin login.",mk:"Set up my school",f1:"For parents",f1d:"See marks, grades, position, attendance and progress for your child, in English or Kiswahili.",f2:"For teachers",f2d:"Upload class marks from Excel, track every learner and record attendance and lateness.",f3:"For the school",f3d:"Manage learners, classes and teachers, upload results and keep the school’s details up to date.",motto:"Tagline",about:"About the school (English)",aboutsw:"About the school (Kiswahili)",abouth:"About us"});
+Object.assign(T.sw,{addcl:"Ongeza darasa",promo:"Fuatilia na simamia shule yako yote mahali pamoja",promod:"Mfumo mmoja kwa wazazi, walimu na wasimamizi. Weka shule yako kwa dakika chache kwa kuingia mara moja kama msimamizi.",mk:"Weka shule yangu",f1:"Kwa wazazi",f1d:"Ona alama, daraja, nafasi, mahudhurio na maendeleo ya mtoto wako kwa Kiswahili au Kiingereza.",f2:"Kwa walimu",f2d:"Pakia alama za darasa kutoka Excel, fuatilia kila mwanafunzi na rekodi mahudhurio na kuchelewa.",f3:"Kwa shule",f3d:"Simamia wanafunzi, madarasa na walimu, pakia matokeo na weka taarifa za shule sasa.",motto:"Kauli mbiu",about:"Kuhusu shule (Kiingereza)",aboutsw:"Kuhusu shule (Kiswahili)",abouth:"Kuhusu sisi"});
+Object.assign(T.en,{review:"Marks review",rvh:"Marks uploaded by teachers are visible only to you. Check them, then publish so parents can see.",pending:"Waiting",published:"Published",publish:"Publish",rdel:"Delete",sent:"Marks sent to the admin for review.",tpl:"Download Excel template",mn:"Mother’s name",mp:"Mother’s phone",me:"Mother’s email",fn:"Father’s name",fp:"Father’s phone",fe:"Father’s email",regp:"Create parent account",myph:"Your phone number (as the school has it)",rhelp:"Mother and father each create their own account with their own password, using the same learner code.",pfx:"Learner code prefix",grading:"Grading",lvls:"Classes offered (comma separated)",addall:"Add all classes",subjl:"Mandatory subjects",subjp:"Mandatory subjects, separated by commas",editsub:"Edit subjects",code:"Learner code",linkhelp:"Enter the learner code and the phone number the school has for you.",fmt:"Columns: Adm (learner code), Name, then one column per subject. Download the class template to get the right columns."});
+Object.assign(T.sw,{review:"Mapitio ya alama",rvh:"Alama zilizopakiwa na walimu zinaonekana kwako tu. Zikague, kisha uzichapishe ili wazazi waone.",pending:"Zinasubiri",published:"Imechapishwa",publish:"Chapisha",rdel:"Futa",sent:"Alama zimetumwa kwa msimamizi kukaguliwa.",tpl:"Pakua fomu ya Excel",mn:"Jina la mama",mp:"Simu ya mama",me:"Barua pepe ya mama",fn:"Jina la baba",fp:"Simu ya baba",fe:"Barua pepe ya baba",regp:"Fungua akaunti ya mzazi",myph:"Namba yako ya simu (kama shule inayo)",rhelp:"Mama na baba kila mmoja anafungua akaunti yake na nenosiri lake, kwa kutumia msimbo uleule wa mwanafunzi.",pfx:"Kiambishi cha msimbo",grading:"Mfumo wa madaraja",lvls:"Madarasa ya shule (tenganisha kwa koma)",addall:"Ongeza madarasa yote",subjl:"Masomo ya lazima",subjp:"Masomo ya lazima, tenganisha kwa koma",editsub:"Hariri masomo",code:"Msimbo wa mwanafunzi",linkhelp:"Weka msimbo wa mwanafunzi na namba ya simu ambayo shule inayo.",fmt:"Safu: Adm (msimbo wa mwanafunzi), Jina, kisha safu moja kwa kila somo. Pakua fomu ya darasa upate safu sahihi."});
+function homeV(m){const c=S.cfg,nw=!S.cfgRow,ab=(L=="sw"&&c.about_sw)||c.about||"",ct=[c.phone,c.email].filter(Boolean).join(" · ");
+ return `<div class="site"><nav class="nb">${lg()}<b>${esc(sn())}</b><span class="gap"></span><button class="lk" onclick="setLang()">${t("lang")}</button><button class="lk" onclick="setTh()" aria-label="theme">${thI()}</button><button class="p" onclick="S.home=0;render()">${t("login")}</button></nav>
+<section class="hero2"><h1>${nw?t("promo"):esc(c.motto||sn())}</h1><p>${nw?t("promod"):t("tag")}</p><button class="p big" onclick="S.home=0;${nw?"S.land=0;S.who='admin';":""}render()">${nw?t("mk"):t("login")}</button></section>
+<section class="grid f">${[["f1","f1d"],["f2","f2d"],["f3","f3d"]].map(([a,b])=>`<div class="card"><h3>${t(a)}</h3><p>${t(b)}</p></div>`).join("")}</section>
+${!nw&&(ab||ct)?`<section class="panel"><h2>${t("abouth")}</h2><p>${esc(ab).replace(/\n/g,"<br>")}</p>${ct?`<p class="hl">${esc(ct)}</p>`:""}</section>`:""}</div>${m}`}
+function shell(b){const m=S.msg?`<div class="toast" role="status">${S.msg}</div>`:"";
+ if(!S.u){const c=S.cfg,sup=c.phone||c.email?`<p class="sub">${esc([c.phone,c.email].filter(Boolean).join(" · "))}</p>`:"";
+  if(S.home)return homeV(m);
+  if(S.land)return `<div class="land"><div class="hero">${lg()}<h1>${esc(sn())}</h1><p>${t("tag")}</p><div class="who">${[["parent","as_parent"],["teacher","as_teacher"],["admin","as_admin"]].map(([w,k])=>`<button onclick="S.land=0;S.who='${w}';render()">${t(k)}</button>`).join("")}</div>${sup}<button class="lk" onclick="S.home=1;render()">← ${t("back")}</button> <button class="lk" onclick="setLang()">${t("lang")}</button><button class="lk" onclick="setTh()" aria-label="theme">${thI()}</button></div>${m}</div>`;
+  return `<div class="land"><div class="lbox">${lg()}<h1>${esc(sn())}</h1><p class="sub">${t("as_"+(S.who||"parent"))}</p>${b}<p class="c"><button class="lk" onclick="S.land=1;render()">← ${t("back")}</button> <button class="lk" onclick="setLang()">${t("lang")}</button><button class="lk" onclick="setTh()" aria-label="theme">${thI()}</button></p></div>${m}</div>`}
+ return `<div class="app"><aside><div class="brand">${lg()}<b>${esc(sn())}</b></div><nav>${tabs()}</nav><div class="sp"><button onclick="setLang()">${t("lang")}</button><button onclick="setTh()">${thI()}</button><button onclick="auth.signOut()">${t("out")}</button></div></aside><main>${b}</main>${m}</div>`}
+function tabs(){const m={admin:[["dash","dash"],["lr","learners"],["cl","classes"],["att","attn"],["up","upload"],["rv","review"],["tc","teachers"],["set","settings"],["sup","support"]],teacher:[["my","myc"],["lp","lprog"],["att","attn"],["sup","support"]],parent:[["kid","myprog"],["sup","support"]]}[S.role];return m.map(([k,l])=>`<button class="${S.tab==k?"on":""}" onclick="S.tab='${k}';S.edit=null;S.vw=null;${k=="rv"?"loadSub();":""}render()">${t(l)}</button>`).join("")}
+function render(){let b;
+ if(!S.u)b=loginV();else if(S.tab=="sup")b=supV();
+ else if(S.role==="admin")b=S.tab=="dash"?dashV():S.tab=="up"?upV():S.tab=="rv"?rvV():S.tab=="lr"?lrV():S.tab=="cl"?clV():S.tab=="att"?attV():S.tab=="set"?setV():S.tab=="rp"?kidV(S.learners.find(l=>l.id==S.edit)||{}):tcV();
+ else if(S.role==="teacher")b=S.tab=="att"?attV():S.tab=="lp"?lpV():myV();
+ else b=S.learners.length?S.learners.map(kidV).join(""):linkV();
+ app.innerHTML=shell(b);S.msg=""}
+function dashV(){const L=S.learners,cl=[...new Set(L.map(l=>l.cls))].sort(),td=today(),pt=L.filter(l=>["P","L"].includes(l.att?.["d"+td.replace(/-/g,"")])).length,lt=L.reduce((n,l)=>n+(l.late||[]).filter(x=>x.d===td).length,0);
+ return `<h1>${t("dash")}</h1><div class="tiles">${[["cnt_l",L.length],["cnt_c",cl.length],["cnt_t",S.teachers.length],["att_t",pt],["late_t",lt]].map(([k,v])=>`<div class="tile"><small>${t(k)}</small><b>${v}</b></div>`).join("")}</div>
+<div class="panel"><h2>${t("learners")}</h2><div class="wrap"><table><tr><th>${t("adm")}<th>${t("name")}<th>${t("cls")}<th></tr>${L.slice(0,6).map(l=>`<tr><td>${esc(l.adm)}<td>${esc(l.name)}<td>${esc(l.cls)}<td><button onclick="S.tab='lr';S.edit='${l.id}';render()">${t("view")}</button></tr>`).join("")}</table></div></div>
+<div class="panel"><h2>${t("byc")}</h2><div class="wrap"><table><tr><th>${t("cls")}<th>${t("learners")}<th>${t("late")}</tr>${cl.map(c=>{const k=L.filter(l=>l.cls===c);return `<tr><td>${esc(c)}<td>${k.length}<td>${k.reduce((n,l)=>n+(l.late||[]).length,0)}</tr>`}).join("")}</table></div></div>`}
+
+function setV(){const c=S.cfg;return `<h1>${S.first?t("welcome"):t("settings")}</h1><div class="panel">${S.first?`<p>${t("wmsg")}</p>`:""}<label>${t("sname")}<input id="sn" value="${esc(c.name||SCHOOL)}"></label><label>${t("motto")}<input id="sm" value="${esc(c.motto)}"></label><label>${t("about")}<textarea id="sa" rows="4">${esc(c.about)}</textarea></label><label>${t("aboutsw")}<textarea id="sx" rows="4">${esc(c.about_sw)}</textarea></label><div class="row"><label>${t("schp")}<input id="sp" value="${esc(c.phone)}"></label><label>${t("sche")}<input id="se" value="${esc(c.email)}"></label><label>${t("start")}<input id="ss" type="time" value="${esc(c.start||START)}"></label></div><div class="row"><label>${t("pfx")}<input id="sf" maxlength="5" value="${esc(c.prefix||pfx())}"></label><label>${t("grading")}<select id="sg"><option value="knec" ${c.grading!="abc"?"selected":""}>KNEC CBC (EE / ME / AE / BE)</option><option value="abc" ${c.grading=="abc"?"selected":""}>A – F</option></select></label></div><label>${t("lvls")}<input id="sv" value="${esc(c.levels||LV.join(", "))}"></label><label>${t("logo")} (${t("opt")})<input id="sl" type="file" accept="image/*"></label>${c.logo?`<p>${lg()} <button onclick="S.rmlogo=1;saveCfg()">${t("remove")}</button></p>`:""}<p><button class="p" onclick="saveCfg()">${S.first?t("cont"):t("save")}</button> ${S.first?`<button onclick="saveCfg(1)">${t("skip")}</button>`:""}</p></div>`+(S.first?"":`<div class="panel"><h2>${t("chpw")}</h2><label>${t("newpw")}<input id="np" type="password" autocomplete="new-password"></label><button onclick="chPw()">${t("save")}</button></div>`)}
+function readLogo(f){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,240/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=i.width*k;c.height=i.height*k;c.getContext("2d").drawImage(i,0,0,c.width,c.height);res(c.toDataURL("image/png"))};i.src=r.result};r.readAsDataURL(f)})}
+async function saveCfg(skip){const g=i=>$(i)?$(i).value.trim():"",c={...S.cfg};
+ if(!skip){c.name=g("#sn")||c.name||SCHOOL;c.motto=g("#sm");c.about=g("#sa");c.about_sw=g("#sx");c.phone=g("#sp");c.email=g("#se");c.start=g("#ss")||c.start;{const pv=g("#sf").toUpperCase().replace(/[^A-Z0-9]/g,"");if(pv&&pv!==pfx())c.prefix=pv;else if(!S.cfg.prefix)delete c.prefix}c.grading=g("#sg")||"knec";c.levels=g("#sv");const f=$("#sl")&&$("#sl").files[0];if(f)c.logo=await readLogo(f);if(S.rmlogo)delete c.logo}
+ S.rmlogo=0;const{error}=await sb.from("settings").upsert({id:"school",data:c});if(error)return note(error.message);
+ S.cfg=c;S.cfgRow=true;S.first=0;S.tab="dash";document.title=sn();render();note(t("ok"))}
+async function chPw(){const p=$("#np").value;if(p.length<6)return note("Min 6 characters");const{error}=await sb.auth.updateUser({password:p});note(error?error.message:t("pwok"))}
+const FAQ=[{en:["How do I see my child’s marks?","Log in and open My learner. Marks appear after the class teacher uploads them."],sw:["Naonaje alama za mtoto wangu?","Ingia kisha fungua Mwanafunzi wangu. Alama huonekana mwalimu akishazipakia."]},{en:["I forgot my password","Contact the school office and they will help you get back in."],sw:["Nimesahau nenosiri","Wasiliana na ofisi ya shule, watakusaidia kuingia tena."]},{en:["My special ID does not work","Check the spelling (example GSA001) or ask the school for a new one."],sw:["Kitambulisho changu hakifanyi kazi","Angalia herufi (mfano GSA001) au uombe kipya shuleni."]}];
+function supV(){const c=S.cfg;return `<h1>${t("support")}</h1><div class="panel"><h2>${t("contact")}</h2>${c.phone?`<p><a href="tel:${esc(c.phone)}">${esc(c.phone)}</a></p>`:""}${c.email?`<p><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></p>`:""}${c.phone||c.email?"":`<p>${t("none")}</p>`}</div><div class="panel"><h2>FAQ</h2>${FAQ.map(f=>`<details><summary>${f[L][0]}</summary><p>${f[L][1]}</p></details>`).join("")}</div>`}
+function lpV(){const cs=[...new Set((S.me.assign||[]).map(a=>a.cls))],c=cs.includes(S.lc)?S.lc:cs[0];S.lc=c;
+ if(S.vw){const l=S.learners.find(x=>x.id==S.vw);if(l)return `<p class="np"><button onclick="S.vw=null;render()">← ${t("back")}</button></p>`+kidV(l)+editV(l)}
+ return `<h1>${t("lprog")}</h1><label>${t("cls")}<select onchange="S.lc=this.value;render()">${cs.map(x=>`<option ${x==c?"selected":""}>${esc(x)}</option>`).join("")}</select></label><div class="grid">${S.learners.filter(l=>l.cls===c).map(l=>{GC=l.cls;const ts=Object.keys(l.results||{}).sort(),r=l.results[ts[ts.length-1]],a=r?avgR(r):0;return `<button class="card lk2" onclick="S.vw='${l.id}';render()"><span class="av">${ini(l.name)}</span><b>${esc(l.name)}</b><small>${r?`${a}% ${gr(a)} · #${r.pos||"-"}`:t("none")}</small></button>`}).join("")}</div>`}
+function kidV(l){GC=l.cls;const R=l.results||{},ts=Object.keys(R).sort(),cur=R[key(S.term)]?key(S.term):ts[ts.length-1],r=R[cur],pv=R[ts[ts.indexOf(cur)-1]],n=l.notes||{},A=Object.values(l.att||{}),pa=A.length?Math.round(A.filter(x=>x!="A").length/A.length*100):null,sb2=Object.entries(r?.subjects||{}).sort((a,b)=>b[1]-a[1]),a=r?avgR(r):0,mx=Math.max(...ts.map(k=>R[k].total),1);
+ return `<div class="hd"><span class="av big">${ini(l.name||"?")}</span><div><h1>${esc(l.name)}</h1><p>${esc(l.cls)} · ${t("adm")} ${esc(l.adm)}${[l.mn,l.fn,l.gn].filter(Boolean).length?" · "+[l.mn,l.fn,l.gn].filter(Boolean).map(esc).join(" & "):""}</p></div></div>`
+ +(r?`<label class="np">${t("term")}<select onchange="S.term=this.value;render()">${ts.map(k=>`<option value="${k}" ${k==cur?"selected":""}>${esc(dsp(k))}</option>`).join("")}</select></label>
+<div class="tiles"><div class="tile"><small>${t("pos")}</small><b>${r.pos||"-"}</b> <span>${t("of")} ${r.n||"-"}</span></div><div class="tile"><small>${t("avg")}</small><b>${a}%</b> <span class="chip ${gc(a)}">${gr(a)}</span></div><div class="tile"><small>${t("total")}</small><b>${r.total}</b></div><div class="tile"><small>${t("attp")}</small><b>${pa==null?"-":pa+"%"}</b></div></div>
+${sb2.length?`<p class="hl">${t("best")}: <b>${esc(dsp(sb2[0][0]))}</b> (${sb2[0][1]}) · ${t("weak")}: <b>${esc(dsp(sb2[sb2.length-1][0]))}</b> (${sb2[sb2.length-1][1]})</p>`:""}
+<h2>${t("marks")}</h2><div class="grid">${sb2.map(([s,v])=>{const o=pv?.subjects?.[s],d=o==null?null:v-o;return `<div class="card"><small>${esc(dsp(s))}</small><b>${v}</b> <span class="chip ${gc(v)}">${gr(v)}</span><span class="bar" style="width:${v}%"></span>${d==null?"":`<small class="${d>=0?"up":"dn"}">${d>0?"▲":d<0?"▼":"■"} ${Math.abs(d)}</small>`}</div>`}).join("")}</div>
+<h2>${t("trend")}</h2>${ts.map(k=>`<div class="tr"><span>${esc(dsp(k))}</span><span class="bar" style="width:${R[k].total/mx*100}%"></span><b>${R[k].total}${R[k].pos?` · #${R[k].pos}`:""}</b></div>`).join("")}`:`<p>${t("none")}</p>`)
+ +`<h2>${t("comm")}</h2><div class="grid">${["acad","phys","mind"].map(k=>`<div class="card"><small>${t(k)}</small><p>${n[k]?esc(n[k]):t("none")}</p></div>`).join("")}</div>`
+ +attR(l)+`<h2>${t("late")}: ${(l.late||[]).length}</h2>`+(l.late||[]).slice(-5).map(x=>`<p>${esc(x.d)}: ${x.m} ${t("min")}</p>`).join("")+`<p class="np"><button class="p" onclick="window.print()">${t("prt")}</button></p>`}
+
+/* ---------- Supabase adapter ---------- */
+const PK={learners:"id",teachers:"email",classes:"id"};
+const DEF={learners:()=>({adm:"",name:"",cls:"",code:"",gn:"",gp:"",mn:"",mp:"",me:"",fn:"",fp:"",fe:"",parents:[],results:{},notes:{},late:[],att:{}}),teachers:()=>({name:"",phone:"",assign:[],clock:null}),classes:()=>({name:"",teacher:"",room:"",cap:"",subj:""})};
+const AU=x=>({__au:x}),cl=x=>JSON.parse(JSON.stringify(x??null));
+function setP(o,path,v){const p=path.split(".");let c=o;for(const k of p.slice(0,-1))c=c[k]=c[k]&&typeof c[k]=="object"?c[k]:{};c[p[p.length-1]]=v}
+function mrg(a,b){for(const k in b){const v=b[k];a[k]=v&&typeof v=="object"&&!Array.isArray(v)?mrg(a[k]&&typeof a[k]=="object"&&!Array.isArray(a[k])?a[k]:{},v):v}return a}
+function apply(row,upd,ch){for(const[k,v]of Object.entries(upd)){const top=k.split(".")[0];ch.add(top);
+ if(v&&v.__au){const a=Array.isArray(row[top])?row[top]:[];row[top]=a.some(y=>JSON.stringify(y)==JSON.stringify(v.__au))?a:[...a,v.__au]}
+ else if(k.includes(".")){row[top]=cl(row[top])||{};setP(row,k,v)}else row[k]=v}}
+async function run(ops){const by={};ops.forEach(o=>(by[o.c]=by[o.c]||[]).push(o));
+ for(const c in by){const pk=PK[c],ids=[...new Set(by[c].map(o=>o.id))];
+  const{data,error}=await sb.from(c).select("*").in(pk,ids);if(error)throw error;
+  const cur={},ch={},del=[],ins=new Set();(data||[]).forEach(r=>cur[r[pk]]=r);
+  for(const o of by[c]){if(o.k=="del"){del.push(o.id);continue}
+   let row=cur[o.id];if(!row){if(o.k=="upd")throw new Error("Record not found");row=cur[o.id]={...DEF[c](),[pk]:o.id};ins.add(o.id)}
+   const st=ch[o.id]=ch[o.id]||new Set();
+   if(o.k=="set"){mrg(row,o.d);Object.keys(o.d).forEach(k=>st.add(k))}else apply(row,o.d,st)}
+  const jobs=[],rows=[...ins].map(id=>cur[id]);
+  if(rows.length)jobs.push(sb.from(c).insert(rows));
+  Object.keys(ch).filter(id=>!ins.has(id)).forEach(id=>{const u={};ch[id].forEach(k=>u[k]=cur[id][k]);jobs.push(sb.from(c).update(u).eq(pk,id))});
+  if(del.length)jobs.push(sb.from(c).delete().in(pk,del));
+  for(const r of await Promise.all(jobs))if(r.error)throw r.error}}
+function mkdb(){const doc=(c,id)=>({c,id,
+  async get(){const{data,error}=await sb.from(c).select("*").eq(PK[c],id).maybeSingle();if(error)throw error;return{exists:!!data,id,data:()=>data||undefined}},
+  set:(d)=>run([{c,id,k:"set",d}]),update:d=>run([{c,id,k:"upd",d}]),delete:()=>run([{c,id,k:"del"}])});
+ const coll=(c,f)=>({doc:id=>doc(c,id),where:(fl,op,v)=>coll(c,q=>q.contains(fl,[v])),async get(){let q=sb.from(c).select("*");if(f)q=f(q);const{data,error}=await q;if(error)throw error;return{docs:(data||[]).map(r=>({id:r[PK[c]],data:()=>r}))}}});
+ return{collection:c=>coll(c),batch:()=>{const ops=[];return{set(r,d){ops.push({c:r.c,id:r.id,k:"set",d})},update(r,d){ops.push({c:r.c,id:r.id,k:"upd",d})},delete(r){ops.push({c:r.c,id:r.id,k:"del"})},commit:()=>run(ops)}}}}
+function mkauth(){let last;const mk=u=>u&&{uid:u.id,email:u.email};
+ return{createUserWithEmailAndPassword:async(e,p)=>{const{data,error}=await sb.auth.signUp({email:e,password:p});if(error)throw error;if(!data.session)throw new Error("Turn OFF Confirm email in Supabase: Authentication > Providers > Email.")},
+ signInWithEmailAndPassword:async(e,p)=>{const{error}=await sb.auth.signInWithPassword({email:e,password:p});if(error)throw error},
+ signOut:()=>sb.auth.signOut(),
+ onAuthStateChanged:cb=>sb.auth.onAuthStateChange((ev,ses)=>{const id=ses?.user?.id||null;if(ev=="TOKEN_REFRESHED"||id===last)return;last=id;setTimeout(()=>cb(mk(ses?.user)),0)})}}
+
+/* ---------- start ---------- */
+document.documentElement.lang=L;
+if(!SB_KEY){app.innerHTML=shell("<p>Add your Supabase URL and key at the top of this file (SB_URL and SB_KEY).</p>")}
+else{sb=supabase.createClient(SB_URL,SB_KEY);auth=mkauth();db=mkdb();window.cfgP=sb.from("settings").select("data").eq("id","school").maybeSingle().then(({data})=>{S.cfg=data?.data||{};S.cfgRow=!!data;document.title=sn();render()});
+ auth.onAuthStateChanged(async u=>{S.u=u;S.msg="";if(!u){S.role=null;S.land=1;S.home=1;return render()}
+  try{await window.cfgP;const em=u.email.toLowerCase();
+   if((await sb.rpc("is_admin")).data===true)S.role="admin";
+   else{const d=await db.collection("teachers").doc(em).get();S.role=d.exists?"teacher":"parent";S.me=d.data()}
+   await load();if(S.role==="parent"&&!S.learners.length&&S.pend){const v=S.pend;S.pend=null;if(!await linkId(v.code,v.ph,1))S.lf=1}S.tab=S.role==="admin"&&!S.cfgRow?(S.first=1,"set"):{admin:"dash",teacher:"my",parent:"kid"}[S.role];render();if(S.lf){S.lf=0;note(t("nf"))}}catch(x){note(x.message)}});
+ render()}
+</script></body></html>
